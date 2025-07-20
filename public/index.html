@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Dynamic Meta Tags for SEO and Social Sharing -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Thơ Tình - Poetry Collection">
+    <meta property="og:description" content="Những vần thơ từ trái tim">
+    <meta property="og:image" content="/images/poetry-share-image.jpg">
+    <meta property="og:url" content="">
+    <meta name="twitter:card" content="summary_large_image">
+
+    <script>
+        // Check if we're on a shared poem page
+        const pathParts = window.location.pathname.split('/');
+        if (pathParts[1] === 'poem' && pathParts[2]) {
+            const poemId = pathParts[2];
+
+            // Fetch poem metadata for SEO
+            fetch(`/api/poems/${poemId}/meta`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.title) {
+                        document.title = data.title + ' - Thơ Tình';
+                        document.querySelector('meta[property="og:title"]').setAttribute('content', data.title);
+                        document.querySelector('meta[property="og:description"]').setAttribute('content', data.description);
+                        document.querySelector('meta[property="og:url"]').setAttribute('content', window.location.href);
+                    }
+                })
+                .catch(error => console.error('Error fetching poem metadata:', error));
+        }
+    </script>
+    <title>Thơ Tình - Poetry Collection</title>
+    <link rel="stylesheet" href="style.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;600;700&family=Playfair+Display:wght@300;400;600&display=swap"
+        rel="stylesheet">
+    <meta name="google-signin-client_id"
+        content="1032631111946-jpjqg2oj5h3rbb00rffv9rcbbe9or2ap.apps.googleusercontent.com">
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+</head>
+
+<body>
+    <!-- Background Elements -->
+    <div class="background-container">
+        <div class="floating-elements"></div>
+        <div class="gradient-overlay"></div>
+        <div class="custom-background" id="customBackground"></div>
+    </div>
+
+    <!-- Audio Player -->
+    <audio id="backgroundMusic" loop></audio>
+    <div class="music-control" id="musicControl">
+        <button id="musicToggle">🎵</button>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <h1 class="main-title">Tình thơ</h1>
+            <p class="subtitle">Nơi những nỗi niềm không thể nói</p>
+        </header>
+
+        <!-- Loading -->
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Đang tải bài thơ...</p>
+        </div>
+
+        <!-- Poem List -->
+        <div class="poem-list" id="poemList">
+            <!-- Poems will be loaded here -->
+        </div>
+
+        <!-- Passcode Modal -->
+        <div class="modal" id="passcodeModal">
+            <div class="modal-content">
+                <span class="close">×</span>
+                <h2>Nhập Mật Khẩu</h2>
+                <p>Vui lòng nhập mật khẩu để đọc bài thơ</p>
+                <input type="password" id="passcodeInput" placeholder="Mật khẩu...">
+                <button id="submitPasscode">Xác Nhận</button>
+                <div class="error-message" id="errorMessage"></div>
+            </div>
+        </div>
+
+        <!-- Poem Display -->
+        <div class="poem-display" id="poemDisplay">
+            <button class="back-btn" id="backBtn">← Quay Lại</button>
+            <div class="poem-content">
+                <h2 id="poemTitle"></h2>
+                <div class="poem-text" id="poemText"></div>
+            </div>
+
+            <!-- Comments Section -->
+            <div class="comments-section">
+                <h3 class="comments-title">Bình luận</h3>
+
+                <!-- Comment Form -->
+                <div class="comment-form">
+                    <div class="comment-input-group">
+                        <input type="text" id="commentName" placeholder="Tên của bạn" maxlength="50">
+                        <textarea id="commentText" placeholder="Viết bình luận của bạn..." maxlength="500"></textarea>
+                    </div>
+                    <button id="submitComment">Gửi bình luận</button>
+                    <div id="commentError" class="comment-error"></div>
+                </div>
+
+                <!-- Comments List -->
+                <div class="comments-list" id="commentsList">
+                    <!-- Comments will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Social Sharing -->
+            <div class="social-sharing">
+                <h3>Chia sẻ bài thơ</h3>
+                <div class="share-buttons">
+                    <button id="shareFacebook" class="share-btn facebook">
+                        <i class="fab fa-facebook-f"></i> Facebook
+                    </button>
+                    <button id="shareTwitter" class="share-btn twitter">
+                        <i class="fab fa-twitter"></i> Twitter
+                    </button>
+                    <button id="copyLink" class="share-btn link">
+                        <i class="fas fa-link"></i> Sao chép liên kết
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

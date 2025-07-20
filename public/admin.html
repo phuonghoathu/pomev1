@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Quản lý Thơ</title>
+    <script src="https://cdn.tiny.cloud/1/t4talt3ppwo0f9cfo0xadpafqirztaxojx6bhalr0o1iln8q/tinymce/7/tinymce.min.js" referrerpolicy="origin"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        textarea {
+            height: 150px;
+            resize: vertical;
+        }
+
+        .file-input {
+            border: 2px dashed #ddd;
+            padding: 20px;
+            text-align: center;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .file-input:hover {
+            border-color: #667eea;
+            background-color: #f8f9ff;
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: transform 0.3s ease;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .poems-list {
+            margin-top: 40px;
+        }
+
+        .poem-item {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border-left: 4px solid #667eea;
+        }
+
+        .poem-item h3 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .poem-item p {
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .poem-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-small {
+            padding: 8px 16px;
+            font-size: 14px;
+            width: auto;
+            margin: 0;
+        }
+
+        .btn-danger {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a52);
+        }
+        
+        .btn-edit {
+            background: linear-gradient(45deg, #4facfe, #00f2fe);
+        }
+
+        .message {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        /* TinyMCE custom styles */
+        .tox-tinymce {
+            border-radius: 8px !important;
+            border: 2px solid #ddd !important;
+        }
+        
+        .tox-statusbar {
+            border-top: 1px solid #ddd !important;
+        }
+        
+        /* Preview styles */
+        .preview-container {
+            margin-top: 20px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+        }
+        
+        .preview-title {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            color: #555;
+        }
+        
+        .preview-content {
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #eee;
+        }
+        
+        /* Form mode toggle */
+        .form-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .form-title {
+            font-size: 1.5rem;
+            color: #333;
+        }
+        
+        .form-mode-toggle {
+            display: flex;
+            align-items: center;
+        }
+        
+        .mode-label {
+            margin-right: 10px;
+            color: #555;
+        }
+        
+        .cancel-edit {
+            background: #ccc;
+            color: #333;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+        
+        /* File preview */
+        .file-preview {
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .file-preview img {
+            max-width: 100px;
+            max-height: 100px;
+            border-radius: 5px;
+            margin-right: 10px;
+        }
+        
+        .file-preview audio {
+            max-width: 200px;
+        }
+        
+        .file-preview .remove-file {
+            color: #ff6b6b;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌸 Quản lý Thơ</h1>
+        
+        <div id="message"></div>
+        
+        <form id="poemForm" enctype="multipart/form-data">
+            <div class="form-header">
+                <div class="form-title" id="formTitle">Thêm Bài Thơ Mới</div>
+                <div class="form-mode-toggle" id="formModeToggle" style="display: none;">
+                    <button type="button" class="cancel-edit" id="cancelEdit">Hủy Chỉnh Sửa</button>
+                </div>
+            </div>
+            
+            <input type="hidden" id="poemId" name="poemId">
+            <input type="hidden" id="editMode" value="false">
+            
+            <div class="form-group">
+                <label for="title">Tiêu đề bài thơ:</label>
+                <input type="text" id="title" name="title" >
+            </div>
+            
+            <div class="form-group">
+                <label for="introduction">Giới thiệu:</label>
+                <textarea id="introduction" name="introduction" placeholder="Viết giới thiệu ngắn về bài thơ..." ></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="passcode">Mật khẩu:</label>
+                <input type="text" id="passcode" name="passcode" placeholder="Mật khẩu để đọc bài thơ" >
+            </div>
+            
+            <div class="form-group">
+                <label for="content">Nội dung thơ:</label>
+                <textarea id="content" name="content" placeholder="Nhập nội dung bài thơ, mỗi dòng một câu thơ..."></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="backgroundType">Loại background:</label>
+                <select id="backgroundType" name="backgroundType">
+                    <option value="seasonal">Theo mùa</option>
+                    <option value="custom">Tùy chỉnh</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>Ảnh nền (tùy chọn):</label>
+                <div class="file-input" onclick="document.getElementById('backgroundImage').click()">
+                    <input type="file" id="backgroundImage" name="backgroundImage" accept="image/*" style="display: none;">
+                    <p>📷 Chọn ảnh nền</p>
+                    <span id="backgroundFileName"></span>
+                </div>
+                <div class="file-preview" id="backgroundPreview" style="display: none;">
+                    <img id="backgroundPreviewImg" src="" alt="Background Preview">
+                    <span class="remove-file" onclick="removeBackgroundImage()">❌ Xóa</span>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>Nhạc nền (tùy chọn):</label>
+                <div class="file-input" onclick="document.getElementById('musicFile').click()">
+                    <input type="file" id="musicFile" name="musicFile" accept="audio/*" style="display: none;">
+                    <p>🎵 Chọn file nhạc</p>
+                    <span id="musicFileName"></span>
+                </div>
+                <div class="file-preview" id="musicPreview" style="display: none;">
+                    <audio id="musicPreviewAudio" controls></audio>
+                    <span class="remove-file" onclick="removeMusicFile()">❌ Xóa</span>
+                </div>
+            </div>
+            
+            <!-- Preview section -->
+            <div class="preview-container" id="previewContainer" style="display: none;">
+                <div class="preview-title">Xem trước:</div>
+                <div class="preview-content" id="previewContent"></div>
+            </div>
+            
+            <button type="button" class="btn" style="margin-right: 10px; width: calc(50% - 5px); float: left;" id="previewBtn">Xem Trước</button>
+            <button type="submit" class="btn" style="width: calc(50% - 5px); float: right;" id="submitBtn">Thêm Bài Thơ</button>
+            <div style="clear: both;"></div>
+        </form>
+        
+        <div class="poems-list">
+            <h2>Danh sách bài thơ</h2>
+            <div id="poemsList"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3000/api';
+        let currentBackgroundImage = null;
+        let currentMusicFile = null;
+        let editingPoemId = null;
+        
+        // Khởi tạo TinyMCE
+        function initTinyMCE() {
+            if (tinymce.get('introduction')) {
+                tinymce.get('introduction').remove();
+            }
+            if (tinymce.get('content')) {
+                tinymce.get('content').remove();
+            }
+            
+            tinymce.init({
+                selector: '#introduction',
+                height: 200,
+                menubar: false,
+                plugins: [
+                    'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
+                    'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+                    'insertdatetime', 'media', 'table', 'help', 'wordcount'
+                ],
+                toolbar: 'undo redo | blocks | ' +
+                    'bold italic forecolor | alignleft aligncenter ' +
+                    'alignright alignjustify | bullist numlist outdent indent | ' +
+                    'removeformat | help',
+                content_style: 'body { font-family: Arial, sans-serif; font-size: 16px }',
+                setup: function(editor) {
+                    editor.on('change', function() {
+                        editor.save();
+                    });
+                }
+            });
+            
+            tinymce.init({
+                selector: '#content',
+                height: 300,
+                menubar: false,
+                plugins: [
+                    'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
+                    'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+                    'insertdatetime', 'media', 'table', 'help', 'wordcount'
+                ],
+                toolbar: 'undo redo | blocks | ' +
+                    'bold italic forecolor | alignleft aligncenter ' +
+                    'alignright alignjustify | bullist numlist outdent indent | ' +
+                    'removeformat | help',
+                content_style: 'body { font-family: Arial, sans-serif; font-size: 16px }',
+                setup: function(editor) {
+                    editor.on('change', function() {
+                        editor.save();
+                    });
+                }
+            });
+        }
+        
+        // Khởi tạo TinyMCE khi trang tải
+        initTinyMCE();
+
+        // File input handlers
+        document.getElementById('backgroundImage').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                document.getElementById('backgroundFileName').textContent = file.name;
+                
+                // Hiển thị preview
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('backgroundPreviewImg').src = e.target.result;
+                    document.getElementById('backgroundPreview').style.display = 'flex';
+                };
+                reader.readAsDataURL(file);
+                
+                // Đánh dấu là đã thay đổi
+                currentBackgroundImage = null;
+            }
+        });
+        
+        document.getElementById('musicFile').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                document.getElementById('musicFileName').textContent = file.name;
+                
+                // Hiển thị preview
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('musicPreviewAudio').src = e.target.result;
+                    document.getElementById('musicPreview').style.display = 'flex';
+                };
+                reader.readAsDataURL(file);
+                
+                // Đánh dấu là đã thay đổi
+                currentMusicFile = null;
+            }
+        });
+        
+        // Xóa file ảnh nền
+        function removeBackgroundImage() {
+            document.getElementById('backgroundImage').value = '';
+            document.getElementById('backgroundFileName').textContent = '';
+            document.getElementById('backgroundPreview').style.display = 'none';
+            currentBackgroundImage = '';  // Đánh dấu là đã xóa
+        }
+        
+        // Xóa file nhạc
+        function removeMusicFile() {
+            document.getElementById('musicFile').value = '';
+            document.getElementById('musicFileName').textContent = '';
+            document.getElementById('musicPreview').style.display = 'none';
+            currentMusicFile = '';  // Đánh dấu là đã xóa
+        }
+        
+        // Preview button handler
+        document.getElementById('previewBtn').addEventListener('click', function() {
+            const previewContainer = document.getElementById('previewContainer');
+            const previewContent = document.getElementById('previewContent');
+            
+            // Get content from TinyMCE editors
+            const title = document.getElementById('title').value;
+            const introContent = tinymce.get('introduction').getContent();
+            const poemContent = tinymce.get('content').getContent();
+            
+            // Create preview HTML
+            let previewHTML = '';
+            if (title) {
+                previewHTML += `<h2 style="color: #8b4b8c; font-size: 1.8rem; margin-bottom: 15px;">${title}</h2>`;
+            }
+            
+            if (introContent) {
+                previewHTML += `<div style="margin-bottom: 20px; padding: 15px; background: #f8f8f8; border-radius: 8px;">
+                    <h3 style="color: #555; margin-bottom: 10px;">Giới thiệu:</h3>
+                    ${introContent}
+                </div>`;
+            }
+            
+            if (poemContent) {
+                previewHTML += `<div style="padding: 15px; background: #fff8f8; border-radius: 8px;">
+                    <h3 style="color: #555; margin-bottom: 10px;">Nội dung thơ:</h3>
+                    ${poemContent}
+                </div>`;
+            }
+            
+            previewContent.innerHTML = previewHTML;
+            previewContainer.style.display = 'block';
+            
+            // Scroll to preview
+            previewContainer.scrollIntoView({ behavior: 'smooth' });
+        });
+        
+        // Cancel edit button handler
+        document.getElementById('cancelEdit').addEventListener('click', function() {
+            resetForm();
+        });
+        
+        // Show message
+        function showMessage(text, type = 'success') {
+            const messageDiv = document.getElementById('message');
+            messageDiv.innerHTML = `<div class="message ${type}">${text}</div>`;
+            setTimeout(() => {
+                messageDiv.innerHTML = '';
+            }, 5000);
+        }
+        
+        // Reset form
+        function resetForm() {
+            document.getElementById('poemForm').reset();
+            document.getElementById('poemId').value = '';
+            document.getElementById('editMode').value = 'false';
+            document.getElementById('formTitle').textContent = 'Thêm Bài Thơ Mới';
+            document.getElementById('submitBtn').textContent = 'Thêm Bài Thơ';
+            document.getElementById('formModeToggle').style.display = 'none';
+            document.getElementById('backgroundFileName').textContent = '';
+            document.getElementById('musicFileName').textContent = '';
+            document.getElementById('backgroundPreview').style.display = 'none';
+            document.getElementById('musicPreview').style.display = 'none';
+            document.getElementById('previewContainer').style.display = 'none';
+            
+            // Reset TinyMCE
+            tinymce.get('introduction').setContent('');
+            tinymce.get('content').setContent('');
+            
+            // Reset variables
+            currentBackgroundImage = null;
+            currentMusicFile = null;
+            editingPoemId = null;
+        }
+        
+        // Load poems
+        async function loadPoems() {
+            try {
+                const response = await fetch(`${API_BASE}/poems`);
+                const poems = await response.json();
+                
+                const poemsList = document.getElementById('poemsList');
+                
+                // Tạo một phần tử tạm để xử lý HTML
+                const tempDiv = document.createElement('div');
+                
+                poemsList.innerHTML = poems.map(poem => {
+                    // Xử lý nội dung giới thiệu có thể chứa HTML
+                    tempDiv.innerHTML = poem.introduction;
+                    const plainText = tempDiv.textContent || tempDiv.innerText || '';
+                    const shortIntro = plainText.length > 100 ? plainText.substring(0, 100) + '...' : plainText;
+                    
+                    return `
+                        <div class="poem-item">
+                            <h3>${poem.title}</h3>
+                            <p><strong>Giới thiệu:</strong> ${shortIntro}</p>
+                            <p><strong>Ngày tạo:</strong> ${new Date(poem.createdAt).toLocaleDateString('vi-VN')}</p>
+                            ${poem.musicFile ? `<p>🎵 Có nhạc nền</p>` : ''}
+                            ${poem.backgroundImage ? `<p>📷 Có ảnh nền tùy chỉnh</p>` : ''}
+                            <div class="poem-actions">
+                                <button class="btn btn-small btn-edit" onclick="editPoem('${poem.id}')">Sửa</button>
+                                <button class="btn btn-small btn-danger" onclick="deletePoem('${poem.id}')">Xóa</button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            } catch (error) {
+                showMessage('Lỗi khi tải danh sách bài thơ', 'error');
+            }
+        }
+        
+        // Edit poem
+        async function editPoem(id) {
+            try {
+                const response = await fetch(`${API_BASE}/poems/${id}/admin`);
+                
+                if (!response.ok) {
+                    throw new Error('Failed to fetch poem details');
+                }
+                
+                const poem = await response.json();
+                editingPoemId = poem.id;
+                
+                // Cập nhật form
+                document.getElementById('poemId').value = poem.id;
+                document.getElementById('editMode').value = 'true';
+                document.getElementById('title').value = poem.title;
+                document.getElementById('passcode').value = poem.passcode;
+                document.getElementById('backgroundType').value = poem.backgroundType || 'seasonal';
+                
+                // Cập nhật TinyMCE
+                tinymce.get('introduction').setContent(poem.introduction);
+                
+                // Xử lý nội dung thơ (có thể là mảng hoặc HTML)
+                if (Array.isArray(poem.content)) {
+                    tinymce.get('content').setContent(poem.content.join('<br>'));
+                } else {
+                    tinymce.get('content').setContent(poem.content);
+                }
+                
+                // Hiển thị ảnh nền nếu có
+                if (poem.backgroundImage) {
+                    currentBackgroundImage = poem.backgroundImage;
+                    document.getElementById('backgroundPreviewImg').src = poem.backgroundImage;
+                    document.getElementById('backgroundPreview').style.display = 'flex';
+                } else {
+                    document.getElementById('backgroundPreview').style.display = 'none';
+                }
+                
+                // Hiển thị nhạc nền nếu có
+                if (poem.musicFile) {
+                    currentMusicFile = poem.musicFile;
+                    document.getElementById('musicPreviewAudio').src = poem.musicFile;
+                    document.getElementById('musicPreview').style.display = 'flex';
+                } else {
+                    document.getElementById('musicPreview').style.display = 'none';
+                }
+                
+                // Cập nhật UI
+                document.getElementById('formTitle').textContent = 'Chỉnh Sửa Bài Thơ';
+                document.getElementById('submitBtn').textContent = 'Cập Nhật Bài Thơ';
+                document.getElementById('formModeToggle').style.display = 'block';
+                
+                // Cuộn lên đầu form
+                document.getElementById('poemForm').scrollIntoView({ behavior: 'smooth' });
+                
+            } catch (error) {
+                console.error('Error fetching poem details:', error);
+                showMessage('Lỗi khi tải thông tin bài thơ', 'error');
+            }
+        }
+        
+        // Add/Update poem
+        document.getElementById('poemForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            // Lấy nội dung từ TinyMCE
+            const introContent = tinymce.get('introduction').getContent();
+            const poemContent = tinymce.get('content').getContent();
+            
+            const formData = new FormData(this);
+            
+            // Thay thế nội dung từ TinyMCE
+            formData.set('introduction', introContent);
+            formData.set('content', poemContent);
+            
+            // Xử lý ảnh nền và nhạc nền hiện tại
+            if (currentBackgroundImage === '') {
+                formData.set('removeBackgroundImage', 'true');
+            }
+            
+            if (currentMusicFile === '') {
+                formData.set('removeMusicFile', 'true');
+            }
+            
+            const isEditMode = document.getElementById('editMode').value === 'true';
+            const poemId = document.getElementById('poemId').value;
+            
+            try {
+                let response;
+                
+                if (isEditMode) {
+                    // Cập nhật bài thơ
+                    response = await fetch(`${API_BASE}/poems/${poemId}`, {
+                        method: 'PUT',
+                        body: formData
+                    });
+                } else {
+                    // Thêm bài thơ mới
+                    response = await fetch(`${API_BASE}/poems`, {
+                        method: 'POST',
+                        body: formData
+                    });
+                }
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    showMessage(isEditMode ? 'Cập nhật bài thơ thành công!' : 'Thêm bài thơ thành công!');
+                    resetForm();
+                    loadPoems();
+                } else {
+                    showMessage(result.error || 'Có lỗi xảy ra', 'error');
+                }
+            } catch (error) {
+                showMessage('Lỗi kết nối server', 'error');
+            }
+        });
+        
+        // Delete poem
+        async function deletePoem(id) {
+            if (!confirm('Bạn có chắc chắn muốn xóa bài thơ này?')) return;
+            
+            try {
+                const response = await fetch(`${API_BASE}/poems/${id}`, {
+                    method: 'DELETE'
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    showMessage('Xóa bài thơ thành công!');
+                    loadPoems();
+                    
+                    // Nếu đang chỉnh sửa bài thơ này, reset form
+                    if (editingPoemId === id) {
+                        resetForm();
+                    }
+                } else {
+                    showMessage(result.error || 'Có lỗi xảy ra', 'error');
+                }
+            } catch (error) {
+                showMessage('Lỗi kết nối server', 'error');
+            }
+        }
+        
+        // Load poems on page load
+        loadPoems();
+    </script>
+</body>
+</html>
